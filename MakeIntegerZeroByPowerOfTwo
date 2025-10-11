@@ -1,0 +1,47 @@
+You are given two integers num1 and num2.
+
+In one operation, you can choose integer i in the range [0, 60] and subtract 2^ii + num2 from num1.
+
+Return the integer denoting the minimum number of operations needed to make num1 equal to 0.
+
+If it is impossible to make num1 equal to 0, return -1.
+
+
+class Solution {
+    // num1 - (2^i_1 + num2) - (2^i_2 + num2) - ... - (2^i_k + num2) = 0
+    // num1 - k * num2 = 2^i_1 + 2^i_2 + ... + 2^i_k
+    // num1 - k * num2 = k * 2^i (i can be anything)
+    // 2^i is basically a binary number with 1 bit set. So k * 2^i is adding up many binary numbers with each having just 1 bit set
+    // ex: 0010 + 1000 + 0001 + 1000 = 10011 = 19
+    // if we take k=1, it means we can have only one 2^i. Minimum it can be is 2^0=1. Max it depends on whichever bit is set
+    // if we take k>1, Minimum we can have many 2^0's i.e. 1+1+..k times =k. Max it depends on whichever bit is set in each 2^i
+
+    // lets take num1=19, num2=4, k=1. 19 - 1 * 4 = 15. So k * 2^i need to be equal to 15. 15 has 4 bits set. 
+    // So we need four (equal to number of set bits) numbers (minimum): 1000, 0100, 0010, 0001 = 15
+    // OR we need fifteen (1+1+1..) numbers (maximum): 0001, 0001, 0001, 0001, ... = 15
+    // But k is 1. We can have only one 2^i. Not solvable. So we increase k and try.
+
+    // lets take num1=19, num2=4, k=3. 19 - 3 * 4 = 7. So k * 2^i need to be equal to 7. 7 has 3 bits set. 
+    // So we need three (equal to number of set bits) numbers (minimum): 0100, 0010, 0001 = 7
+    // OR we need seven (1+1+1..) numbers (maximum): 0001, 0001, 0001, 0001, 0001, 0001, 0001 = 7
+    // We can have three 2^i's because k=3. Solvable.
+
+    // lets take num1=19, num2=4, k=4. 19 - 4 * 4 = 3. So k * 2^i need to be equal to 3. 3 has 2 bits set. 
+    // So we need two (equal to number of set bits) numbers (minimum): 0010, 0001 = 3
+    // OR we need three (1+1+1..) numbers (maximum): 0001, 0001, 0001 = 3
+    // But k has become 4. We need to have four numbers atleast. Which means it will always exceed the value 3. Not solvable.
+
+    public int makeTheIntegerZero(int num1, int num2) {
+        int k = 1;
+        while (true) {
+            long x = num1 - (long) num2 * k;
+            if (x < k) {
+                return -1;
+            }
+            if (k >= Long.bitCount(x)) {
+                return k;
+            }
+            k++;
+        }
+    }
+}
